@@ -24,48 +24,59 @@
 #include "Arduino.h"
 #include <Adafruit_BusIO_Register.h>
 
-#define VCNL4020_I2C_ADDRESS 0x13  ///< The address is fixed
+#define VCNL4020_I2C_ADDRESS 0x13 ///< The address is fixed
 
 ///< VCNL4020 Register Definitions
 #define VCNL4020_REG_COMMAND 0x80 ///< Register #0 Command Register
-#define VCNL4020_REG_PRODUCT_ID 0x81 ///< Register #1 Product ID Revision Register
-#define VCNL4020_REG_PROX_RATE 0x82 ///< Register #2 Rate of Proximity Measurement
-#define VCNL4020_REG_IR_LED_CURRENT 0x83 ///< Register #3 (Not explicitly named in datasheet)
-#define VCNL4020_REG_AMBIENT_PARAM 0x84 ///< Register #4 Ambient Light Parameter Register
-#define VCNL4020_REG_AMBIENT_RESULT_HIGH 0x85 ///< Register #5 Ambient Light Result High Byte
-#define VCNL4020_REG_AMBIENT_RESULT_LOW 0x86 ///< Register #6 Ambient Light Result Low Byte
-#define VCNL4020_REG_PROX_RESULT_HIGH 0x87 ///< Register #7 Proximity Result High Byte
-#define VCNL4020_REG_PROX_RESULT_LOW 0x88 ///< Register #8 Proximity Result Low Byte
+#define VCNL4020_REG_PRODUCT_ID                                                \
+  0x81 ///< Register #1 Product ID Revision Register
+#define VCNL4020_REG_PROX_RATE                                                 \
+  0x82 ///< Register #2 Rate of Proximity Measurement
+#define VCNL4020_REG_IR_LED_CURRENT                                            \
+  0x83 ///< Register #3 (Not explicitly named in datasheet)
+#define VCNL4020_REG_AMBIENT_PARAM                                             \
+  0x84 ///< Register #4 Ambient Light Parameter Register
+#define VCNL4020_REG_AMBIENT_RESULT_HIGH                                       \
+  0x85 ///< Register #5 Ambient Light Result High Byte
+#define VCNL4020_REG_AMBIENT_RESULT_LOW                                        \
+  0x86 ///< Register #6 Ambient Light Result Low Byte
+#define VCNL4020_REG_PROX_RESULT_HIGH                                          \
+  0x87 ///< Register #7 Proximity Result High Byte
+#define VCNL4020_REG_PROX_RESULT_LOW                                           \
+  0x88                             ///< Register #8 Proximity Result Low Byte
 #define VCNL4020_REG_INT_CTRL 0x89 ///< Register #9 Interrupt Control Register
-#define VCNL4020_REG_LOW_THRES_HIGH 0x8A ///< Register #10 Low Threshold High Byte
+#define VCNL4020_REG_LOW_THRES_HIGH                                            \
+  0x8A ///< Register #10 Low Threshold High Byte
 #define VCNL4020_REG_LOW_THRES_LOW 0x8B ///< Register #11 Low Threshold Low Byte
-#define VCNL4020_REG_HIGH_THRES_HIGH 0x8C ///< Register #12 High Threshold High Byte
-#define VCNL4020_REG_HIGH_THRES_LOW 0x8D ///< Register #13 High Threshold Low Byte
+#define VCNL4020_REG_HIGH_THRES_HIGH                                           \
+  0x8C ///< Register #12 High Threshold High Byte
+#define VCNL4020_REG_HIGH_THRES_LOW                                            \
+  0x8D                               ///< Register #13 High Threshold Low Byte
 #define VCNL4020_REG_INT_STATUS 0x8E ///< Register #14 Interrupt status register
-#define VCNL4020_REG_PROX_ADJUST 0x8F ///< Register #15 Proximity adjustment register
+#define VCNL4020_REG_PROX_ADJUST                                               \
+  0x8F ///< Register #15 Proximity adjustment register
 
 typedef enum {
-  PROX_RATE_1_95_PER_S = 0x00,  ///< 1.95 measurements/s
-  PROX_RATE_3_9_PER_S  = 0x01,  ///< 3.90625 measurements/s
-  PROX_RATE_7_8_PER_S  = 0x02,  ///< 7.8125 measurements/s
-  PROX_RATE_16_6_PER_S = 0x03,  ///< 16.625 measurements/s
-  PROX_RATE_31_2_PER_S = 0x04,  ///< 31.25 measurements/s
-  PROX_RATE_62_5_PER_S = 0x05,  ///< 62.5 measurements/s
-  PROX_RATE_125_PER_S  = 0x06,  ///< 125 measurements/s
-  PROX_RATE_250_PER_S  = 0x07   ///< 250 measurements/s
+  PROX_RATE_1_95_PER_S = 0x00, ///< 1.95 measurements/s
+  PROX_RATE_3_9_PER_S = 0x01,  ///< 3.90625 measurements/s
+  PROX_RATE_7_8_PER_S = 0x02,  ///< 7.8125 measurements/s
+  PROX_RATE_16_6_PER_S = 0x03, ///< 16.625 measurements/s
+  PROX_RATE_31_2_PER_S = 0x04, ///< 31.25 measurements/s
+  PROX_RATE_62_5_PER_S = 0x05, ///< 62.5 measurements/s
+  PROX_RATE_125_PER_S = 0x06,  ///< 125 measurements/s
+  PROX_RATE_250_PER_S = 0x07   ///< 250 measurements/s
 } vcnl4020_proxrate;
 
 typedef enum {
-  AMBIENT_RATE_1_SPS = 0x00,  ///< 1 samples/s
-  AMBIENT_RATE_2_SPS = 0x01,  ///< 2 samples/s (DEFAULT)
-  AMBIENT_RATE_3_SPS = 0x02,  ///< 3 samples/s
-  AMBIENT_RATE_4_SPS = 0x03,  ///< 4 samples/s
-  AMBIENT_RATE_5_SPS = 0x04,  ///< 5 samples/s
-  AMBIENT_RATE_6_SPS = 0x05,  ///< 6 samples/s
-  AMBIENT_RATE_8_SPS = 0x06,  ///< 8 samples/s
-  AMBIENT_RATE_10_SPS = 0x07  ///< 10 samples/s
+  AMBIENT_RATE_1_SPS = 0x00, ///< 1 samples/s
+  AMBIENT_RATE_2_SPS = 0x01, ///< 2 samples/s (DEFAULT)
+  AMBIENT_RATE_3_SPS = 0x02, ///< 3 samples/s
+  AMBIENT_RATE_4_SPS = 0x03, ///< 4 samples/s
+  AMBIENT_RATE_5_SPS = 0x04, ///< 5 samples/s
+  AMBIENT_RATE_6_SPS = 0x05, ///< 6 samples/s
+  AMBIENT_RATE_8_SPS = 0x06, ///< 8 samples/s
+  AMBIENT_RATE_10_SPS = 0x07 ///< 10 samples/s
 } vcnl4020_ambientrate;
-
 
 typedef enum {
   AVG_1_SAMPLES = 0x00,  ///< 2^0 = 1 sample
@@ -79,38 +90,37 @@ typedef enum {
 } vcnl4020_averaging;
 
 typedef enum {
-  INT_COUNT_1 = 0x00,   ///< 1 count (DEFAULT)
-  INT_COUNT_2 = 0x01,   ///< 2 count
-  INT_COUNT_4 = 0x02,   ///< 4 count
-  INT_COUNT_8 = 0x03,   ///< 8 count
-  INT_COUNT_16 = 0x04,  ///< 16 count
-  INT_COUNT_32 = 0x05,  ///< 32 count
-  INT_COUNT_64 = 0x06,  ///< 64 count
-  INT_COUNT_128 = 0x07  ///< 128 count
+  INT_COUNT_1 = 0x00,  ///< 1 count (DEFAULT)
+  INT_COUNT_2 = 0x01,  ///< 2 count
+  INT_COUNT_4 = 0x02,  ///< 4 count
+  INT_COUNT_8 = 0x03,  ///< 8 count
+  INT_COUNT_16 = 0x04, ///< 16 count
+  INT_COUNT_32 = 0x05, ///< 32 count
+  INT_COUNT_64 = 0x06, ///< 64 count
+  INT_COUNT_128 = 0x07 ///< 128 count
 } vcnl4020_int_count;
 
 typedef enum {
   PROX_FREQ_390_625_KHZ = 0x00, ///< 390.625 kHz (DEFAULT)
-  PROX_FREQ_781_25_KHZ  = 0x01, ///< 781.25 kHz
-  PROX_FREQ_1_5625_MHZ  = 0x02, ///< 1.5625 MHz
-  PROX_FREQ_3_125_MHZ   = 0x03  ///< 3.125 MHz
+  PROX_FREQ_781_25_KHZ = 0x01,  ///< 781.25 kHz
+  PROX_FREQ_1_5625_MHZ = 0x02,  ///< 1.5625 MHz
+  PROX_FREQ_3_125_MHZ = 0x03    ///< 3.125 MHz
 } vcnl4020_proxfreq;
 
-
-#define VCNL4020_INT_TH_HI      0x01  ///< High threshold exceed
-#define VCNL4020_INT_TH_LOW     0x02  ///< Low threshold exceed
-#define VCNL4020_INT_ALS_READY  0x04  ///< ALS ready
-#define VCNL4020_INT_PROX_READY 0x08  ///< Proximity ready
-
+#define VCNL4020_INT_TH_HI 0x01 ///< High threshold exceed
+#define VCNL4020_INT_TH_LOW 0x02 ///< Low threshold exceed
+#define VCNL4020_INT_ALS_READY 0x04 ///< ALS ready
+#define VCNL4020_INT_PROX_READY 0x08 ///< Proximity ready
 
 /*!
- * @brief Class that stores state and functions for interacting with VCNL4020 sensor.
+ * @brief Class that stores state and functions for interacting with VCNL4020
+ * sensor.
  */
 class Adafruit_VCNL4020 {
 public:
   Adafruit_VCNL4020();
   bool begin(TwoWire *theWire = &Wire, uint8_t addr = VCNL4020_I2C_ADDRESS);
-  
+
   // Command Register Functions
   bool isALSReady();
   bool isProxReady();
@@ -152,9 +162,11 @@ public:
   uint16_t getHighThreshold();
 
   // Interrupt Control Register Function
-  void setInterruptConfig(bool proxReady, bool alsReady, bool thresh, bool threshALS, vcnl4020_int_count intCount);
+  void setInterruptConfig(bool proxReady, bool alsReady, bool thresh,
+                          bool threshALS, vcnl4020_int_count intCount);
   uint8_t getInterruptStatus();
-  void clearInterrupts(bool proxready, bool alsready, bool th_low, bool th_high);
+  void clearInterrupts(bool proxready, bool alsready, bool th_low,
+                       bool th_high);
 
 private:
   Adafruit_I2CDevice *_i2c;
