@@ -56,6 +56,7 @@
 #define VCNL4020_REG_PROX_ADJUST                                               \
   0x8F ///< Register #15 Proximity adjustment register
 
+/** The measurements-per-second for automatic proximity sensing */
 typedef enum {
   PROX_RATE_1_95_PER_S = 0x00, ///< 1.95 measurements/s
   PROX_RATE_3_9_PER_S = 0x01,  ///< 3.90625 measurements/s
@@ -67,6 +68,7 @@ typedef enum {
   PROX_RATE_250_PER_S = 0x07   ///< 250 measurements/s
 } vcnl4020_proxrate;
 
+/** The measurements-per-second for automatic ambient sensing */
 typedef enum {
   AMBIENT_RATE_1_SPS = 0x00, ///< 1 samples/s
   AMBIENT_RATE_2_SPS = 0x01, ///< 2 samples/s (DEFAULT)
@@ -78,6 +80,7 @@ typedef enum {
   AMBIENT_RATE_10_SPS = 0x07 ///< 10 samples/s
 } vcnl4020_ambientrate;
 
+/** How many samples to average together per reading */
 typedef enum {
   AVG_1_SAMPLES = 0x00,  ///< 2^0 = 1 sample
   AVG_2_SAMPLES = 0x01,  ///< 2^1 = 2 samples
@@ -89,6 +92,7 @@ typedef enum {
   AVG_128_SAMPLES = 0x07 ///< 2^7 = 128 samples
 } vcnl4020_averaging;
 
+/** How many out-of-bounds measurements before we trigger an IRQ */
 typedef enum {
   INT_COUNT_1 = 0x00,  ///< 1 count (DEFAULT)
   INT_COUNT_2 = 0x01,  ///< 2 count
@@ -100,6 +104,7 @@ typedef enum {
   INT_COUNT_128 = 0x07 ///< 128 count
 } vcnl4020_int_count;
 
+/** Advanced usage adjustable proximity squarewave carrier */
 typedef enum {
   PROX_FREQ_390_625_KHZ = 0x00, ///< 390.625 kHz (DEFAULT)
   PROX_FREQ_781_25_KHZ = 0x01,  ///< 781.25 kHz
@@ -122,8 +127,6 @@ public:
   bool begin(TwoWire *theWire = &Wire, uint8_t addr = VCNL4020_I2C_ADDRESS);
 
   // Command Register Functions
-  bool isALSReady();
-  bool isProxReady();
   void setOnDemand(bool als, bool prox);
   void enable(bool als, bool prox, bool selftimed);
 
@@ -154,6 +157,7 @@ public:
 
   // Proximity Measurement Result Register Function
   uint16_t readProximity();
+  bool isProxReady();
 
   // Low and High Threshold Functions
   void setLowThreshold(uint16_t threshold);
