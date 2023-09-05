@@ -24,6 +24,8 @@
 #include "Arduino.h"
 #include <Adafruit_BusIO_Register.h>
 
+#define VCNL4020_I2C_ADDRESS 0x13  ///< The address is fixed
+
 ///< VCNL4020 Register Definitions
 #define VCNL4020_REG_COMMAND 0x80 ///< Register #0 Command Register
 #define VCNL4020_REG_PRODUCT_ID 0x81 ///< Register #1 Product ID Revision Register
@@ -39,7 +41,8 @@
 #define VCNL4020_REG_LOW_THRES_LOW 0x8B ///< Register #11 Low Threshold Low Byte
 #define VCNL4020_REG_HIGH_THRES_HIGH 0x8C ///< Register #12 High Threshold High Byte
 #define VCNL4020_REG_HIGH_THRES_LOW 0x8D ///< Register #13 High Threshold Low Byte
-#define VCNL4020_REG_AMBIENT_IR_LEVEL 0x90 ///< Register #16 Ambient IR Light Level Register
+#define VCNL4020_REG_INT_STATUS 0x8E ///< Register #14 Interrupt status register
+#define VCNL4020_REG_PROX_ADJUST 0x8F ///< Register #15 Proximity adjustment register
 
 typedef enum {
   PROX_RATE_1_95_PER_S = 0x00,  ///< 1.95 measurements/s
@@ -105,8 +108,8 @@ typedef enum {
  */
 class Adafruit_VCNL4020 {
 public:
-  Adafruit_VCNL4020(TwoWire *theWire = &Wire);
-  bool begin(uint8_t addr = VCNL4020_I2C_ADDRESS);
+  Adafruit_VCNL4020();
+  bool begin(TwoWire *theWire = &Wire, uint8_t addr = VCNL4020_I2C_ADDRESS);
   
   // Command Register Functions
   bool isALSReady();
@@ -120,6 +123,8 @@ public:
   // Proximity Measurement Rate Functions
   void setProxRate(vcnl4020_proxrate rate);
   vcnl4020_proxrate getProxRate();
+  void setProxFrequency(vcnl4020_proxfreq freq);
+  vcnl4020_proxfreq getProxFrequency();
 
   // LED Current Setting for Proximity Mode Functions
   void setProxLEDmA(uint8_t LEDmA);
@@ -130,7 +135,12 @@ public:
   void setAutoOffsetComp(bool autoOffset);
 
   // Ambient Light Result Register Function
-  uint16_t readALS();
+  bool isAmbientReady();
+  uint16_t readAmbient();
+  void setAmbientRate(vcnl4020_ambientrate rate);
+  vcnl4020_ambientrate getAmbientRate();
+  void setAmbientAveraging(vcnl4020_averaging avg);
+  vcnl4020_averaging getAmbientAveraging();
 
   // Proximity Measurement Result Register Function
   uint16_t readProximity();
@@ -143,6 +153,8 @@ public:
 
   // Interrupt Control Register Function
   void setInterruptConfig(bool proxReady, bool alsReady, bool thresh, bool threshALS, vcnl4020_int_count intCount);
+  uint8_t getInterruptStatus();
+  void clearInterrupts(bool proxready, bool alsready, bool th_low, bool th_high);
 
 private:
   Adafruit_I2CDevice *_i2c;
