@@ -112,9 +112,9 @@ typedef enum {
   PROX_FREQ_3_125_MHZ = 0x03    ///< 3.125 MHz
 } vcnl4020_proxfreq;
 
-#define VCNL4020_INT_TH_HI 0x01 ///< High threshold exceed
-#define VCNL4020_INT_TH_LOW 0x02 ///< Low threshold exceed
-#define VCNL4020_INT_ALS_READY 0x04 ///< ALS ready
+#define VCNL4020_INT_TH_HI      0x01 ///< High threshold exceed
+#define VCNL4020_INT_TH_LOW     0x02 ///< Low threshold exceed
+#define VCNL4020_INT_ALS_READY  0x04 ///< ALS ready
 #define VCNL4020_INT_PROX_READY 0x08 ///< Proximity ready
 
 /*!
