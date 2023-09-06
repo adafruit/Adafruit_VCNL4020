@@ -56,6 +56,8 @@
 #define VCNL4020_REG_PROX_ADJUST                                               \
   0x8F ///< Register #15 Proximity adjustment register
 
+// clang-format off
+
 /** The measurements-per-second for automatic proximity sensing */
 typedef enum {
   PROX_RATE_1_95_PER_S = 0x00, ///< 1.95 measurements/s
@@ -116,6 +118,8 @@ typedef enum {
 #define VCNL4020_INT_TH_LOW     0x02 ///< Low threshold exceed
 #define VCNL4020_INT_ALS_READY  0x04 ///< ALS ready
 #define VCNL4020_INT_PROX_READY 0x08 ///< Proximity ready
+
+// clang-format on
 
 /*!
  * @brief Class that stores state and functions for interacting with VCNL4020
