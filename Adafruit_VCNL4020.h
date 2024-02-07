@@ -177,7 +177,7 @@ public:
                        bool th_high);
 
 private:
-  Adafruit_I2CDevice *_i2c;
+  Adafruit_I2CDevice *_i2c = NULL;
 };
 
 #endif // ADAFRUIT_VCNL4020_H
